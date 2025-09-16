@@ -56,6 +56,38 @@ struct ProgrammaticNavigationDemo: View {
     }
 }
 
+// PROBLEM: Previous approach works only when all navigation data is of one type, but when you want to navigate to multiple different data types (like Int and String), it doesn't work.
+struct HandleMultipleTypeNavigation: View {
+    // SOLUTION: NavigationPath, which is like a type-erased array of navigation data - It can hold a mix of Int, String, UUID, or anything that's Hashable.
+    @State private var path = NavigationPath()
+    
+    @ViewBuilder var buttons: some View {
+        Button("Show Int: 32") {
+            path.append(32) // We can add an Int
+        }
+        
+        Button("Show String: 'Swift'") {
+            path.append("Swift") // Or we can even add a String
+        }
+    }
+    
+    var body: some View {
+        NavigationStack(path: $path) {
+            VStack {
+                buttons
+            }
+            .navigationDestination(for: Int.self) { selectedInt in
+                Text("You Selected Int: \(selectedInt)")
+                buttons
+            }
+            .navigationDestination(for: String.self) { selectedString in
+                Text("You Selected String: \(selectedString)")
+                buttons
+            }
+        }
+    }
+}
+
 #Preview {
-    ProgrammaticNavigationDemo()
+    HandleMultipleTypeNavigation()
 }
