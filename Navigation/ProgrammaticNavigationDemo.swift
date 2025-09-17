@@ -88,6 +88,41 @@ struct HandleMultipleTypeNavigation: View {
     }
 }
 
+
+
+
+// How to make a NavigationStack return to its root view programmatically
+struct RandomNumView: View {
+    let number: Int
+//  @Binding var path: [Int]
+    @Binding var path: NavigationPath // The @Binding property wrapper lets us pass an @State property into another view and modify it from there – we can share an @State property in several places, and changing it in one place will change it everywhere. Sharing a binding like this is common – it's exactly how TextField, Stepper, and other controls work.
+    
+    var body: some View {
+        NavigationLink("Go to Random Number", value: Int.random(in: 1...1000))
+            .navigationTitle("Number: \(number)")
+            .toolbar {
+                Button("Home") {
+                //  path.removeAll()
+                    path = NavigationPath()
+                }
+            }
+    }
+}
+
+struct ReturnToRootView: View {
+//  @State private var path = [Int]()
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        NavigationStack(path: $path) {
+            RandomNumView(number: 0, path: $path)
+                .navigationDestination(for: Int.self) { selectedRandom in
+                    RandomNumView(number: selectedRandom, path: $path)
+                }
+        }
+    }
+}
+
 #Preview {
-    HandleMultipleTypeNavigation()
+    ReturnToRootView()
 }
